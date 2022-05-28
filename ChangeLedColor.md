@@ -113,3 +113,62 @@ C4:SendToProxy (500, 'MATCH_LED_STATE', {STATE = '1'})
 C4:SendToProxy (501, 'MATCH_LED_STATE', {STATE = '1'})
 C4:SendToProxy (502, 'MATCH_LED_STATE', {STATE = '0'})
 ```
+
+
+
+
+
+
+
+
+
+function ReceivedFromProxy (idBinding, strCommand, tParams)
+    if type(PROXY_CMDS[strCommand]) == "function" then
+        local success, retVal = pcall(PROXY_CMDS[strCommand], tParams, idBinding)
+        if success then
+            return retVal
+        end
+    end
+    return nil
+end
+
+function PROXY_CMDS.DO_CLICK (tParams, idBinding)
+	if (idBinding == 500) then
+		-- Toggle button click acts like UI button pressed
+		PROXY_CMDS.SELECT (tParams)
+
+	elseif (idBinding == 501) then
+		STATE = true
+		DisplayState (STATE)
+
+	elseif (idBinding == 502) then
+		STATE = false
+		DisplayState (STATE)
+
+	else
+		print ('Unhandled binding ' .. idBinding)
+	end
+end
+
+function PROXY_CMDS.REQUEST_BUTTON_COLORS (tParams, idBinding)
+	if (idBinding == 500) then
+		C4:SendToProxy(500, "BUTTON_COLORS", {ON_COLOR = {COLOR_STR = LED ['On']}, OFF_COLOR = {COLOR_STR = LED ['Off']}}, "NOTIFY")
+
+	elseif (idBinding == 501) then
+		C4:SendToProxy(501, "BUTTON_COLORS", {ON_COLOR = {COLOR_STR = LED ['On']}, OFF_COLOR = {COLOR_STR = '000000'}}, "NOTIFY")
+
+	elseif (idBinding == 502) then
+		C4:SendToProxy(502, "BUTTON_COLORS", {ON_COLOR = {COLOR_STR = LED ['Off']}, OFF_COLOR = {COLOR_STR = '000000'}}, "NOTIFY")
+
+	else
+		print ('Unhandled binding ' .. idBinding)
+	end
+end
+
+function PROXY_CMDS.SELECT (tParams, idBinding)
+	if TOGGLE_STATE then
+		STATE = not STATE
+		DisplayState (STATE)
+	end
+
+end
