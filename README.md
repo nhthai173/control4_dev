@@ -1,1 +1,6 @@
-# control4_dev
+
+
+
+- Change LED color
+- Allow Execute in Encrypted Driver
+- Commands and Actions
